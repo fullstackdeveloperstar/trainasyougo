@@ -1,14 +1,14 @@
 
 <div class="app-container">
   <router-outlet></router-outlet>  
-  
+  <!-- <input type="" id="pac-input" name="" [(ngModel)]="searchText"> -->
   <div class="left-side">
     <div class="search-fitness-services">
       <span class="label">Search Fitness Services</span>
       
       <div class="input">
         <input type="" name="">
-        <mat-icon matSuffix>place</mat-icon>
+        <mat-icon matSuffix (click)="search()">place</mat-icon>
       </div>
     </div>  
 
@@ -16,38 +16,66 @@
       <span class="label">Additional Filters</span>
       
       <div class="input">
-        <select>
-          <option>Not Selected</option>
-          <option>Yoga</option>
-          <option>Boxing</option>
-          <option>Swimming</option>
-          <option>Crossfit</option>
-          
+        <select [(ngModel)]="additionalFilter" (change)="onChangeAdditionalFilter($event.target.value)">
+          <option value="no">Not Selected</option>
+          <option value="Yoga">Yoga</option>
+          <option value="Boxing">Boxing</option>
+          <option value="Swimming">Swimming</option>
+          <option value="Crossfit">Crossfit</option>
         </select>
         
       </div>
-    </div>  
+    </div>
+
+    <div class="result">
+      <div *ngFor="let item of searchresults; let i = index" class="search-result-item" (click)="select(i)">
+        <div class="main-content" [ngClass]="{'selected': i==selectedNo}">
+          <span class="no">{{i + 1}} .</span>
+          <div class="name">
+            <div class="name">{{item.name}}</div>
+            <div class="vicinity">{{item.vicinity}}</div>
+          </div>
+          <span class="mins">8 min</span>
+
+          <!-- <mat-icon>play_arrow</mat-icon> -->
+        </div>
+
+        <div class="expand" *ngIf="i == selectedNo">
+          <div class="direction">
+            <div><mat-icon matSuffix>directions</mat-icon></div>
+            <div>DIRECTIONS TO HERE</div>
+          </div>
+          <div class="search">
+            <div><mat-icon matSuffix>search</mat-icon></div>
+            <div>SEACH FROM THIS POINT</div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 
   <div class="right-side">
-    <agm-map [latitude]="70" [longitude]="70"></agm-map>
+    <!-- <agm-map [latitude]="70" [longitude]="70"></agm-map> -->
+    <div id="map"></div>
     <div class="header-search">
       <div class="header-search-content">
         <div class="location-search">
           <mat-icon class="mylocation" matSuffix>my_location</mat-icon>
-          <input type="text" name="">
+          <input type="text" name="" [(ngModel)]="searchText" id="pac-input">
           <mat-icon class="search" matSuffix>search</mat-icon>
         </div>
         <div class="range-search">
-          <input type="text" name="">
+          <input type="number" name="" [(ngModel)]='radius' (change)="changedRadius($event.target.value)">
           <span class="mi">mi</span>
         </div>
         <div class="trans-search">
           <mat-icon class="mylocation" matSuffix>drive_eta</mat-icon>
           <select>
             <option>Driving</option>
-            <option>Biking</option>
+            <option>Transit</option>
             <option>Walking</option>
+            <option>Cycling</option>
+            <option>Flighting</option>
           </select>
         </div>
       </div>

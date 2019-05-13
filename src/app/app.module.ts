@@ -1,5 +1,6 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 
 import { AgmCoreModule } from '@agm/core';
 import { AngularFontAwesomeModule } from 'angular-font-awesome';
@@ -44,8 +45,10 @@ import {
   MatTooltipModule,
   MatTreeModule,
 } from '@angular/material';
-import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 
+import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
+import { SearchService } from './search.service';
+import { HttpClientModule, HttpClientJsonpModule } from "@angular/common/http";
 
 @NgModule({
   declarations: [
@@ -54,9 +57,9 @@ import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
   imports: [
     BrowserModule,
     AppRoutingModule,
-      AgmCoreModule.forRoot({
-      apiKey: 'AIzaSyC4sjontSnsKRfkBqP4CPYdFtMwh-0ISdM'
-    }),
+    // AgmCoreModule.forRoot({
+    //   apiKey: 'AIzaSyDz7iXxtwOMovXzKaaWLzStFo1tDLP5PEg'
+    // }),
 
     AngularFontAwesomeModule,
     BrowserAnimationsModule,
@@ -95,8 +98,14 @@ import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
     MatToolbarModule,
     MatTooltipModule,
     MatTreeModule,
+
+    FormsModule,
+    HttpClientModule,
+    HttpClientJsonpModule
   ],
-  providers: [],
+  providers: [
+  	SearchService
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
