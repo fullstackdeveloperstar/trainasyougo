@@ -16,6 +16,15 @@
 	    display: flex;
 	    flex-direction: column;
 
+	    .logo{
+	    	text-align: center;
+	    	margin-bottom: 30px;
+
+	    	img{
+	    		width: 50%;
+	    	}
+	    }
+
 		.search-fitness-services, .additional-filter{
 			display: flex;
 			align-items: center;
@@ -176,7 +185,7 @@
     				font-weight: bold;
 				}
 
-				.location-search, .range-search, .trans-search{
+				.location-search, .range-search{
 					display: flex;
 					align-items: center;
 					position: relative;
@@ -216,6 +225,31 @@
 					}
 				}
 
+				.trans-search{
+					display: flex;
+					align-items: center;
+					position: relative;
+					background-color: rgba(255,255,255,.5);
+					margin-left: 15px;
+
+
+					select{
+   						color: white;
+					    height: 35px;
+					    width: 120px;
+
+					    option{
+					    	color: black;
+					    }
+					}
+
+					mat-icon{
+						color: white;
+					    margin-left: 10px;
+
+					}
+				}
+
 				.range-search{
 
 					input{
@@ -225,8 +259,31 @@
 				}
 
 			}
+		}
 
+		.bottom-email-box{
+			position: absolute;
+			bottom: 40px;
+			display: flex;
+			justify-content: center;
+			width: 100%;
 
+			.bottom-content{
+				background: linear-gradient(91.04deg, #52A1FC 2.37%, #50EABF 101.08%), #53A4FB;
+				border-radius: 5px;	
+				padding: 15px;
+				display: flex;
+
+				input{
+					height: 25px;
+					padding: 5px;
+					background-color: rgba(255,255,255,.5);
+					outline: none;
+    				border: none;
+    				color: white;
+    				font-weight: bold;
+				}
+			}
 		}
 
 		agm-map {

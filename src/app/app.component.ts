@@ -40,6 +40,7 @@ export class AppComponent {
   travelMode = "DRIVING";
   currentToDir = "";
   searchFitnessService = "GYM";
+  infowindow;
 
   constructor(private searchservice: SearchService) {
   	// this.search()
@@ -178,10 +179,7 @@ export class AppComponent {
 	service.textSearch(request, function(results, status, pagination) {
 	  	if (status == google.maps.places.PlacesServiceStatus.OK) {
 
-	  		
-		    
 		    results.forEach(function(place) {
-		    	// console.log(place);
 		    	i++;
 
 		    	var icon = {
@@ -248,10 +246,13 @@ export class AppComponent {
 		    	  	 		<div class="info-text">Add to my favorite</div>
 		    	  	 	</div>
 		    	  	</div>`;
-		          var infowindow = new google.maps.InfoWindow({
+		    	  if(me.infowindow) {
+		    	  	me.infowindow.close();
+		    	  }
+		          me.infowindow = new google.maps.InfoWindow({
 			          content: contentString
 			      });
-		          infowindow.open(me.map, newMarker);
+		          me.infowindow.open(me.map, newMarker);
 		        });
 
 		    	if (place.geometry.viewport) {
@@ -261,27 +262,77 @@ export class AppComponent {
 			    	bounds.extend(place.geometry.location);
 			    }
 			    me.map.fitBounds(bounds);
-
-			    // me.searchresults.push({'general': results, 'detail': null});
 		    
 		    });
 
 		    me.searchresults = me.searchresults.concat(results);
 
-		    console.log(results)
-
 		    if(pagination.hasNextPage) {
 		    	pagination.nextPage();
 		    }
-
-		    
-		    // me.getPlacesDetails();
 		}
 	});
   }
 
-  select(i) {
+  async select(i) {
   	this.selectedNo = i;
+
+  	var place = this.searchresults[i];
+  	var newMarker = this.markers[i];
+  	var me = this;
+
+	var img = './assets/images/service.jpg';
+	  if( place.photos && place.photos.length > 0) {
+	  	img = place.photos[0].getUrl();
+	  }
+
+	  
+	  let placeDeatil : any = await me.getPlaceDetails(place.place_id);
+	  var open_hours = '';
+	  if(placeDeatil.opening_hours) {
+	  	placeDeatil.opening_hours.weekday_text.forEach(t => {
+	  		open_hours += t + "<br>";
+	  	})
+	  }
+	  
+	  // debugger;
+	  var contentString = 
+	  	`<div class="infowindow">
+	  	 	<div>
+	  	 		<img class="thumb" src="` + img + `">
+	  	 	</div>
+	  	 	<div class="info-item">
+	  	 		<img class="info-icon" src="./assets/images/pin.svg">
+	  	 		<div class="info-text">` + placeDeatil.formatted_address +`</div>
+	  	 	</div>
+
+	  	 	<div class="info-item">
+	  	 		<img class="info-icon" src="./assets/images/open_in_new.svg">
+	  	 		<a class="info-text" target="_blank" href="`+placeDeatil.website+`">` + placeDeatil.website +`</a>
+	  	 	</div>
+	  	 	
+	  	 	<div class="info-item">
+	  	 		<img class="info-icon" src="./assets/images/phone.svg">
+	  	 		<div class="info-text">` + placeDeatil.formatted_phone_number +`</div>
+	  	 	</div>
+
+	  	 	<div class="info-item">
+	  	 		<img class="info-icon" src="./assets/images/timeline.svg">
+	  	 		<div class="info-text">` + open_hours +`</div>
+	  	 	</div>
+
+	  	 	<div class="info-item">
+	  	 		<img class="info-icon" src="./assets/images/bookmark.svg">
+	  	 		<div class="info-text">Add to my favorite</div>
+	  	 	</div>
+	  	</div>`;
+	  if(me.infowindow) {
+	  	me.infowindow.close();
+	  }
+	  me.infowindow = new google.maps.InfoWindow({
+	      content: contentString
+	  });
+	  me.infowindow.open(me.map, newMarker);
   }
 
   onChangeAdditionalFilter(value) {
@@ -306,10 +357,8 @@ export class AppComponent {
     });
 
     if(count != 0) {
-    	// console.log(count);
     	var timer = setTimeout(function(){ me.getPlacesDetails(); }, 200);
     } else {
-    	// console.log(this.searchresults);
     	this.isLoading = false;
     }
 

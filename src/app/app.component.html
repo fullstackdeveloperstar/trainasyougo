@@ -3,6 +3,9 @@
   <router-outlet></router-outlet>  
   <!-- <input type="" id="pac-input" name="" [(ngModel)]="searchText"> -->
   <div class="left-side">
+    <div class="logo">
+      <img src="./assets/images/logo.png">
+    </div>
     <div class="search-fitness-services">
       <span class="label">Search Fitness Services</span>
       
@@ -22,6 +25,16 @@
           <option value="Boxing">Boxing</option>
           <option value="Swimming">Swimming</option>
           <option value="Crossfit">Crossfit</option>
+          <option value="Muay Thai">Muay Thai</option>
+          <option value="Athletics">Athletics</option>
+          <option value="Zumba">Zumba</option>
+          <option value="Pilates">Pilates</option>
+          <option value="Strength and conditioning">Strength and conditioning</option>
+          <option value="Spinning">Spinning</option>
+          <option value="Running">Running </option>
+          <option value="Gymnastics">Gymnastics</option>
+          <option value="Trekking">Trekking</option>
+          <option value="Trekking">Circuit training</option>
         </select>
       </div>
     </div>
@@ -63,6 +76,7 @@
   <div class="right-side">
     <!-- <agm-map [latitude]="70" [longitude]="70"></agm-map> -->
     <div id="map"></div>
+
     <div class="header-search">
       <div class="header-search-content">
         <div class="location-search">
@@ -85,6 +99,17 @@
         </div>
       </div>
     </div>
+
+    <!-- <div class="bottom-email-box">
+      <div class="bottom-content">
+        <input type="email" name="" placeholder="Email">
+        <input type="text" name="" style="margin-left: 15px;" placeholder="Location">  
+        <button mat-raised-button color="primary" style="margin-left: 15px;">
+          <mat-icon matSuffix>send</mat-icon>
+          Send
+        </button>
+      </div>
+    </div> -->
   </div>
 
   <div class="loading" *ngIf="isLoading">
