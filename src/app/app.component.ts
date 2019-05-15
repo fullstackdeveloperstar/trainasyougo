@@ -21,15 +21,25 @@ export class AppComponent {
   markers = [];
   places;
   searchText = "";
-  searchMarker;
+  myMarker;
   radius = 500;
   searchresults = [];
   selectedNo = -1;
-  additionalFilter = "Boxing";
+  additionalFilter = "no";
   currentLat;
   currentLng;
 
-  detailService;  
+  detailService;
+  isLoading = false;
+
+  
+  directionsService;
+  directionsDisplay;
+  geocoder;
+  myLocationAddress;
+  travelMode = "DRIVING";
+  currentToDir = "";
+  searchFitnessService = "GYM";
 
   constructor(private searchservice: SearchService) {
   	// this.search()
@@ -61,12 +71,36 @@ export class AppComponent {
   				me.map.fitBounds(bounds);
   				me.currentLat = position.coords.latitude;
   				me.currentLng = position.coords.longitude;
+
+  				me.myMarker = new google.maps.Marker({
+			        map: me.map,
+			        title: "My location",
+			        position: new google.maps.LatLng(position.coords.latitude, position.coords.longitude)
+			    });
+
+			    var latlng = {lat: me.currentLat, lng: me.currentLng};
+		        me.geocoder.geocode({'location': latlng}, function(results, status) {
+		          if (status === 'OK') {
+		            if (results[0]) {
+		              me.myLocationAddress = results[0].formatted_address;
+		              
+		            } else {
+		              window.alert('No results found');
+		            }
+		          } else {
+		            window.alert('Geocoder failed due to: ' + status);
+		          }
+		        });
+
 		    });
 		} else { }
 
 
 		this.detailService = new google.maps.places.PlacesService(this.map);
-		
+		this.directionsService = new google.maps.DirectionsService;
+        this.directionsDisplay = new google.maps.DirectionsRenderer;
+        this.directionsDisplay.setMap(this.map);
+        this.geocoder = new google.maps.Geocoder;
 
 		this.searchBox.addListener('places_changed', function() {
 	    	me.places = me.searchBox.getPlaces();
@@ -79,11 +113,6 @@ export class AppComponent {
 		    me.markers.forEach(function(marker) {
 		      marker.setMap(null);
 		    });
-
-		    if(me.searchMarker != null) {
-		    	me.searchMarker.setMap(null);	
-		    	me.searchMarker = null;
-		    }
 		    
 
 		    me.markers = [];
@@ -127,30 +156,36 @@ export class AppComponent {
 	    location: pyrmont,
 	    radius: this.radius,
 	    type: ['fitness'],
-	    query: this.additionalFilter
+	    query: this.additionalFilter + ' ' + this.searchFitnessService
 	};
 
-	  var service = new google.maps.places.PlacesService(this.map);
-	  service.nearbySearch(request, function(results, status) {
+	// this.isLoading = true;
+	this.searchresults = [];
+
+	var service = new google.maps.places.PlacesService(this.map);
+
+
+	var i = 0;
+
+	me.markers.forEach(function(marker) {
+      marker.setMap(null);
+    });
+
+    me.markers = [];
+    var bounds = new google.maps.LatLngBounds();
+
+
+	service.textSearch(request, function(results, status, pagination) {
 	  	if (status == google.maps.places.PlacesServiceStatus.OK) {
 
-	  		me.markers.forEach(function(marker) {
-		      marker.setMap(null);
-		    });
-
-		    me.markers = [];
-		    var bounds = new google.maps.LatLngBounds();
-		    var i = 0;
+	  		
+		    
 		    results.forEach(function(place) {
-		    	console.log(place);
+		    	// console.log(place);
 		    	i++;
 
-
-		 
-
-		    	
 		    	var icon = {
-			        url: "assets/pins/number_" + i + ".png",
+			        url:"https://cdn.mapmarker.io/api/v1/pin?size=120&background=%230C797D&text=" + i + "&color=%23FFFFFF&voffset=2&hoffset=1&", //"assets/pins/number_" + i + ".png",
 			        size: new google.maps.Size(150, 150),
 			        origin: new google.maps.Point(0, 0),
 			        anchor: new google.maps.Point(17, 75),
@@ -182,7 +217,7 @@ export class AppComponent {
 			      	})
 			      }
 			      
-			      debugger;
+			      // debugger;
 		    	  var contentString = 
 		    	  	`<div class="infowindow">
 		    	  	 	<div>
@@ -231,14 +266,18 @@ export class AppComponent {
 		    
 		    });
 
-		    me.searchresults = results;
+		    me.searchresults = me.searchresults.concat(results);
 
 		    console.log(results)
 
+		    if(pagination.hasNextPage) {
+		    	pagination.nextPage();
+		    }
+
 		    
-		    me.getPlacesDetails();
-		  }
-	  });
+		    // me.getPlacesDetails();
+		}
+	});
   }
 
   select(i) {
@@ -253,24 +292,34 @@ export class AppComponent {
 
   changedRadius(value){
   	if(value == "") {return;}
-  	// alert(this.additionalFilter);
   	this.search();	
   }
 
-  getPlacesDetails() {
+  async getPlacesDetails() {
   	var me = this;
+  	var count = 0;
   	this.searchresults.forEach(async function(place) {
-  		// place['formatted_address'] = {};
+  		if(place.detail) return true;
+  		count ++;
     	var placeDetail = await me.getPlaceDetails(place.place_id);
     	place.detail = placeDetail;
     });
+
+    if(count != 0) {
+    	// console.log(count);
+    	var timer = setTimeout(function(){ me.getPlacesDetails(); }, 200);
+    } else {
+    	// console.log(this.searchresults);
+    	this.isLoading = false;
+    }
+
   }
 
   getPlaceDetails(place_id) {
   	var me = this;
   	var request = {
 			        placeId: place_id,
-			        fields: ['name', 'formatted_address', 'formatted_phone_number', 'website', 'opening_hours']
+			        fields: ['name', 'formatted_address', 'formatted_phone_number', 'website', 'opening_hours', 'place_id']
 			      };
   	return new Promise((resolve, reject) => {
 			me.detailService.getDetails(request, function(place1, status) {
@@ -281,6 +330,29 @@ export class AppComponent {
 		        }
 		    });    
 		});
+  }
+
+  directionToHere(to) {
+  	var me = this;
+  	this.currentToDir = to;
+
+  	this.directionsService.route({
+      origin: me.myLocationAddress,
+      destination: me.currentToDir,
+      travelMode: me.travelMode
+    }, function(response, status) {
+      if (status === 'OK') {
+        me.directionsDisplay.setDirections(response);
+      } else {
+        window.alert('Directions request failed due to ' + status);
+      }
+    });
+  }
+
+  onChangeTravelMode() {
+  	if(this.searchresults.length > 0) {
+  		this.directionToHere(this.currentToDir)
+  	}
   }
 
 }

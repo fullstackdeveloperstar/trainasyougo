@@ -7,8 +7,8 @@
       <span class="label">Search Fitness Services</span>
       
       <div class="input">
-        <input type="" name="">
-        <mat-icon matSuffix (click)="search()">place</mat-icon>
+        <input type="" name="" [(ngModel)]="searchFitnessService">
+        <mat-icon matSuffix>place</mat-icon>
       </div>
     </div>  
 
@@ -23,8 +23,14 @@
           <option value="Swimming">Swimming</option>
           <option value="Crossfit">Crossfit</option>
         </select>
-        
       </div>
+    </div>
+
+    <div class="search-btn-container">
+      <button mat-raised-button color="primary" (click)="search()">
+        <mat-icon matSuffix>search</mat-icon>
+        Search
+      </button>
     </div>
 
     <div class="result">
@@ -33,15 +39,15 @@
           <span class="no">{{i + 1}} .</span>
           <div class="name">
             <div class="name">{{item.name}}</div>
-            <div class="vicinity">{{item.vicinity}}</div>
+            <div class="vicinity" *ngIf="item.formatted_address">{{item.formatted_address}}</div>
           </div>
-          <span class="mins">8 min</span>
+          <!-- <span class="mins">8 min</span> -->
 
           <!-- <mat-icon>play_arrow</mat-icon> -->
         </div>
 
         <div class="expand" *ngIf="i == selectedNo">
-          <div class="direction">
+          <div class="direction" (click)="directionToHere(item.formatted_address)">
             <div><mat-icon matSuffix>directions</mat-icon></div>
             <div>DIRECTIONS TO HERE</div>
           </div>
@@ -70,16 +76,19 @@
         </div>
         <div class="trans-search">
           <mat-icon class="mylocation" matSuffix>drive_eta</mat-icon>
-          <select>
-            <option>Driving</option>
-            <option>Transit</option>
-            <option>Walking</option>
-            <option>Cycling</option>
-            <option>Flighting</option>
+          <select [(ngModel)]="travelMode" (change)="onChangeTravelMode($event.target.value)">
+            <option value="DRIVING">Driving</option>
+            <option value="TRANSIT">Transit</option>
+            <option value="WALKING">Walking</option>
+            <option value="BICYCLING">Cycling</option>
           </select>
         </div>
       </div>
     </div>
+  </div>
+
+  <div class="loading" *ngIf="isLoading">
+    Loading...
   </div>
 </div>
 
